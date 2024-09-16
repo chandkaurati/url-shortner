@@ -1,19 +1,12 @@
 import LinkInput from "@/components/linkinput";
-import { Button } from "@/components/ui/button";
-import { useUserContext } from "@/context/userContext";
-import { ArrowBigRight, ArrowRight, Fullscreen, LinkIcon } from "lucide-react";
 import React, { useEffect } from "react";
 import { BarLoader } from "react-spinners";
-
+import { useSelector } from "react-redux";
 const Home = () => {
-  const { user, loding , userDetails} = useUserContext();
+  const Userdata = useSelector((state)=> state.auth.userData)
   useEffect(() => {
-    console.log(user)
-  }, []);
-
-  if (loding) {
-    return <BarLoader color="green" width="Fullscreen" />;
-  }
+    console.log(Userdata)
+  }, [Userdata]);
 
   return (
     <div className=" h-full px-4">
@@ -22,7 +15,7 @@ const Home = () => {
           className="break-words text-[2rem] sm:text-[3rem]
     font-extrabold text-gradient text-center"
         >
-          Shortner Your Loooong Links :) {`welcome ${user?.user_metadata?.name}`} 
+          Shortner Your Loooong Links :)
         </h1>
         <LinkInput />
         <p className="text-center break-words font-extralight text-gray-400">

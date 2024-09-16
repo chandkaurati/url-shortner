@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import useFetch from "@/hooks/fetchapi";
-import * as yup from "yup"
-import { loginUser, signUpNewUser } from "@/db/auth-api";
+import * as yup from "yup";
 import Error from "./error";
 import { BeatLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "@/context/userContext";
+import { useDispatch } from "react-redux";
+import authService from "@/db/auth-service";
+import { login } from "@/store/authSclice";
 const Register = () => {
   const [formdata, setFormdata] = useState({
     name: "",
@@ -15,58 +15,58 @@ const Register = () => {
     password: "",
     profile_pic: null,
   });
-
-  const [errors, setErrors] = useState([])
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState();
+  const [errors, setErrors] = useState([]);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleInputChange = (e) => {
     e.preventDefault();
-    const { name, value, type, files } = e.target
+    const { name, value, type, files } = e.target;
     setFormdata((prevstate) => ({
       ...prevstate,
-      [name]:  type === "file" ? files[0] : value,
+      [name]: type === "file" ? files[0] : value,
     }));
   };
 
-  const { data:session , error:apiError, loding, fn:singup} =  useFetch(signUpNewUser, formdata)
-  const {fn:login} =  useFetch(loginUser, formdata)
-  const {fn:getSession} =  useUserContext()
+  useEffect(() => {}, []);
 
-  useEffect(()=>{
-      if(session.session){
-         navigate("/dashboard")
-         login()
-         getSession()
-      }
-  },[session, loding])
-
-
-  const handleSignupUser = async(e)=> {
-    e.preventDefault()
-     try {
+  const handleSignupUser = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
       const schema = yup.object().shape({
-        name : yup.string().required("name is required"),
-        email : yup.string().email("plsease enter a valid email")
-        .required("email is required"),
-        password: yup.string().min(6, "password mustlonger than 6 chagerater").required("password is requred")
-      })
+        name: yup.string().required("name is required"),
+        email: yup
+          .string()
+          .email("plsease enter a valid email")
+          .required("email is required"),
+        password: yup
+          .string()
+          .min(6, "password mustlonger than 6 chagerater")
+          .required("password is requred"),
+      });
 
-      await schema.validate(formdata, {abortEarly:false})
-       let responce =  await singup()
-       console.log(responce)
-     } catch (error) {
-        const newError = []
-        error?.inner?.forEach((err)=>{
-          newError[err.path] = err.message
-        })
-        console.log(newError)
-        setErrors(newError)
-        console.log(error)
-     }
-  }
+      await schema.validate(formdata, { abortEarly: false });
+      const userData = await authService.createAccount(formdata);
+      if (userData.access_token) {
+        dispatch(login({ userData }));
+        navigate("/dashboard");
+      }
+      console.log(userData);
+    } catch (error) {
+      const newError = [];
+      error?.inner?.forEach((err) => {
+        newError[err.path] = err.message;
+      });
+      setErrors(newError);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSignupUser}>
-      {apiError && <Error message={"User Already exists"}/>}
+      {false && <Error message={"User Already exists"} />}
       <Input
         type="text"
         name="name"
@@ -75,7 +75,7 @@ const Register = () => {
         onChange={handleInputChange}
         placeholder="Enter your name"
       />
-      {errors.name && <Error message={errors.name}/>}
+      {errors.name && <Error message={errors.name} />}
       <Input
         type="email"
         name="email"
@@ -84,7 +84,7 @@ const Register = () => {
         onChange={handleInputChange}
         placeholder="Enter your email"
       />
-      {errors.email && <Error message={errors.email}/>}   
+      {errors.email && <Error message={errors.email} />}
       <Input
         type="Password"
         name="password"
@@ -93,8 +93,8 @@ const Register = () => {
         className="mb-3"
         placeholder="Enter your password  "
       />
-      {errors.password && <Error message={errors.password}/>}
-      
+      {errors.password && <Error message={errors.password} />}
+
       {/* <Input
         type="file"
         onChange={handleInputChange}
@@ -102,7 +102,7 @@ const Register = () => {
         placeholder="Enter your password  "
       /> */}
 
-      <Button type="submit">{loding ? <BeatLoader/> : 'Register'}</Button>
+      <Button type="submit">{loading ? <BeatLoader /> : "Register"}</Button>
     </form>
   );
 };

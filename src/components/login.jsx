@@ -4,17 +4,18 @@ import { Button } from "./ui/button";
 import { BeatLoader } from "react-spinners";
 import * as yup from "yup";
 import Error from "./error";
-import { loginUser } from "@/db/auth-api";
-import useFetch from "@/hooks/fetchapi";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "@/context/userContext";
-
+import useFetch from "@/hooks/fetchapi";
+import authService from "@/db/auth-service";
+import { useDispatch } from "react-redux";
+import { login } from "@/store/authSclice";
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [erorrs, setErrors] = useState([]);
+  const [loading, setLoading] = useState();
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -22,26 +23,14 @@ const Login = () => {
       [name]: value,
     }));
   };
-
   const navigate = useNavigate();
-  const {
-    data: session,
-    error: apiError,
-    loding,
-    fn:login,
-  } = useFetch(loginUser, formData);
+  const dispatch = useDispatch();
 
-  const {fn:getSession} = useUserContext()
-
-  useEffect(() => {
-    if (session.session) {
-      navigate("/dashboard");
-      getSession()
-    }
-  }, [session, loding]);
+  useEffect(() => {}, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       setErrors([]);
       const validateSchema = yup.object().shape({
@@ -56,22 +45,25 @@ const Login = () => {
       });
 
       await validateSchema.validate(formData, { abortEarly: false });
-      // const responce = await loginUser(formData.email, formData.password)
-      const responce = await login();
+      const userData = await authService.setSession(formData);
+      if (userData.access_token) {
+        dispatch(login({ userData }));
+        navigate("/dashboard");
+      }
     } catch (error) {
       const newErrors = [];
       error?.inner?.forEach((err) => {
         newErrors[err.path] = err.message;
       });
       setErrors(newErrors);
-      console.log(error);
-      console.log(erorrs.email);
+    } finally {
+      setLoading(false);
     }
   };
-  
+
   return (
     <form onSubmit={handleLogin}>
-      {apiError && <Error message={"wrong credentials"}/>}
+      {false && <Error message={"wrong credentials"} />}
       <Input
         type="email"
         name="email"
@@ -91,7 +83,7 @@ const Login = () => {
       />
       {erorrs.password && <Error message={erorrs.password} />}
       <Button type="submit" className="mt-3">
-        {loding ? <BeatLoader size={10} color="black" /> : "login"}
+        {loading ? <BeatLoader size={10} color="black" /> : "login"}
       </Button>
     </form>
   );

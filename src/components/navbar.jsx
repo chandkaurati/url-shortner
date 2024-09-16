@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import AuthPopup from "./authpopup";
-import { useUserContext } from "@/context/userContext";
 
 import {
   DropdownMenu,
@@ -12,22 +11,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOutIcon } from "lucide-react";
-import useFetch from "@/hooks/fetchapi";
-import { logoutUser } from "@/db/auth-api";
 import { BeatLoader } from "react-spinners";
-
+import { useDispatch, useSelector } from "react-redux";
+import authService from "@/db/auth-service";
+import { logout } from "@/store/authSclice";
 const Navbar = () => {
-  const { user, isAuthenticated, fn: getSession } = useUserContext();
+  const [loading, setLoading] = useState();
   const navigate = useNavigate();
-  const { error, loding, fn: logout } = useFetch(logoutUser);
+  const dispatch = useDispatch();
+  const status = useSelector((state) => state.auth.status);
+  const data = useSelector((state) => state.auth.userData);
 
-  const handleLogout = async() => {
-      await logout()
-      await getSession()
-      navigate("/")
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const responce = await authService.removeSession();
+      if (!responce) {
+        dispatch(logout());
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
-
   return (
     <nav className="flex p-3 justify-between items-center">
       <Link>
@@ -36,19 +44,21 @@ const Navbar = () => {
         </p>
       </Link>
       <div className="flex gap-7">
-        {!isAuthenticated ? (
+        {!status ? (
           <AuthPopup title="login" />
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger>My Accoount</DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>
-                Hi !{user?.user_metadata?.name}
+                {data?.user?.user_metadata?.name}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>
-                <Button onClick={handleLogout}>{loding ? <BeatLoader size={10} /> : "Logout"}</Button>
+                <Button onClick={handleLogout}>
+                  {loading ? <BeatLoader size={10} /> : "Logout"}
+                </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

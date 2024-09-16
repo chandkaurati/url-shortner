@@ -1,24 +1,26 @@
 import { useState } from "react";
 
 
-function useFetch(callback, options = {}) {
+const useFetch = (callback, options) => {
   const [data, setData] = useState({});
-  const [error, seterror] = useState();
-  const [loding, setloding] = useState();
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState();
 
-  const fn = async (...args)=>{
-     try {
-      setloding(true)
-      const responce = await callback(options, ...args )
-      setData(responce)
-     } catch (error) {
-      seterror(error)
-     }finally{
-      setloding(false)
-     }
+   async function fetchData() {
+     setLoading(true)
+      try {
+        const responce = await callback(options)
+        setData(responce)
+        setData(responce?.session)
+      } catch (error) {
+        setError(error)
+      }finally{
+        setLoading(false)
+      }
   }
 
-  return {data, error, loding, fn}
-}
+  return {data, error, loading, fetchData}
+};
+
 
 export default useFetch
