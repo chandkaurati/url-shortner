@@ -23,6 +23,3 @@ dist-ssr
 *.sln
 *.sw?
 
-database-service.js
-linkinput.jsx
-dashboard.jsx
