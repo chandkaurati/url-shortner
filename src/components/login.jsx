@@ -5,7 +5,6 @@ import { BeatLoader } from "react-spinners";
 import * as yup from "yup";
 import Error from "./error";
 import { useNavigate } from "react-router-dom";
-import useFetch from "@/hooks/fetchapi";
 import authService from "@/db/auth-service";
 import { useDispatch } from "react-redux";
 import { login } from "@/store/authSclice";
@@ -48,14 +47,19 @@ const Login = () => {
       const userData = await authService.setSession(formData);
       if (userData.access_token) {
         dispatch(login({ userData }));
-        navigate("/dashboard");
+        alert("login SuccesFull, new you can user our free services")
       }
     } catch (error) {
       const newErrors = [];
-      error?.inner?.forEach((err) => {
-        newErrors[err.path] = err.message;
-      });
-      setErrors(newErrors);
+      if (!error.inner) {
+        error?.inner?.forEach((err) => {
+          newErrors[err.path] = err.message;
+        });
+        setErrors(newErrors);
+      } else {
+        newErrors["AuthApiError"] = "invalid login credentials";
+        setErrors(error.message);
+      }
     } finally {
       setLoading(false);
     }

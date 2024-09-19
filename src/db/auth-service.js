@@ -31,26 +31,21 @@ class AuthService {
   }
 
   async setSession({ email, password }) {
-    try {
-      const { data, error } = await this.supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (data?.session) {
-        return data?.session;
-      } else {
-        return error;
-      }
-    } catch (error) {
-      console.log(error);
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      throw new Error(error);
     }
+    return data?.session;
   }
 
   async getCurrentSession() {
     const { data, error } = await this.supabase.auth.getSession();
     if (error) {
       console.log(error);
-      throw new Error(error.message);
+      throw new Error(error);
     }
     // console.log(data.session.user);
     return data?.session;

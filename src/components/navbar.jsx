@@ -55,6 +55,7 @@ const Navbar = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem><Link to="/dashboard">My Links</Link></DropdownMenuItem>
               <DropdownMenuItem>
                 <Button onClick={handleLogout}>
                   {loading ? <BeatLoader size={10} /> : "Logout"}

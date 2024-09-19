@@ -25,7 +25,7 @@ import { ArrowRight, LogIn } from 'lucide-react';
 import Login from './login';
 import Register from './register';
 
-const AuthPopup = ({title, isInputpopup }) => {
+const AuthPopup = ({title, isInputpopup, urlInput }) => {
   return (
     <>
       <AlertDialog>
@@ -63,7 +63,7 @@ const AuthPopup = ({title, isInputpopup }) => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Login/>
+                      <Login urlinput={urlInput}/>
                     </CardContent>
                   </Card>
                 </div>
