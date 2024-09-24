@@ -22,11 +22,7 @@ const Login = () => {
       [name]: value,
     }));
   };
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  useEffect(() => {}, []);
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -51,15 +47,10 @@ const Login = () => {
       }
     } catch (error) {
       const newErrors = [];
-      if (!error.inner) {
         error?.inner?.forEach((err) => {
           newErrors[err.path] = err.message;
         });
         setErrors(newErrors);
-      } else {
-        newErrors["AuthApiError"] = "invalid login credentials";
-        setErrors(error.message);
-      }
     } finally {
       setLoading(false);
     }
