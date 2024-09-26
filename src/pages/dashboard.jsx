@@ -10,6 +10,7 @@ import Error from "@/components/error";
 import { useSelector } from "react-redux";
 import databaseService from "@/db/database-service";
 import CreateLink from "@/components/createlink";
+import MyLinksTable from "@/components/myLinksTable";
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState();
   const [searchParams] = useSearchParams();
@@ -82,24 +83,7 @@ const Dashboard = () => {
           <Filter className="absolute top-2 right-2 p-1 " />
         </div>
         <div>
-          {urlData.map((url, i) => {
-            return (
-              <div className="border p-1">
-                <p  key={i}>{url?.title}</p>
-                <a href="">{url?.original_url}</a>
-                <a href="">{url?.short_url}</a>
-                <Button
-                  variant=""
-                  onClick={() => {
-                    databaseService.deleteUrl(url?.id);
-                    fetchurls(userdata.user.id);
-                  }}
-                >
-                  delete
-                </Button>
-              </div>
-            );
-          })}
+         <MyLinksTable urls={urlData}/>
         </div>
         {false && <Error message="true" />}
       </div>
