@@ -9,7 +9,7 @@ const LinkInput = () => {
   const state = useSelector((state) => state.auth.status);
   const navigate = useNavigate()
   const handleShorten = (e)=>{
-     navigate(`/dashboard?${lognUrl?`createNew=${lognUrl}`: ""}`)
+  navigate(`/dashboard?${lognUrl?`createNew=${lognUrl}`: ""}`)
   }
   return (
     <div  className="input-container border-gray-600  border-2  rounded-full break-words flex items-center px-3 gap-3 md:px-3 py-2 md:gap-9">

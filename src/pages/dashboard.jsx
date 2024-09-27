@@ -10,14 +10,13 @@ import Error from "@/components/error";
 import { useSelector } from "react-redux";
 import databaseService from "@/db/database-service";
 import CreateLink from "@/components/createlink";
-import MyLinksTable from "@/components/myLinksTable";
+import MyLinksTable from "@/components/linkstable";
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState();
   const [urlData, setUrlsData] = useState([]);
   const [clicksData, setClicksData] = useState([]);
-  const longLink = searchParams.get("createNew");
   const userdata = useSelector((state) => state.auth.userData);
 
   const fetchurls = useCallback(async (user_id) => {
@@ -83,7 +82,7 @@ const Dashboard = () => {
           <Filter className="absolute top-2 right-2 p-1 " />
         </div>
         <div>
-         <MyLinksTable urls={urlData}/>
+          <MyLinksTable urls={urlData} fetchurls={fetchurls} />
         </div>
         {false && <Error message="true" />}
       </div>

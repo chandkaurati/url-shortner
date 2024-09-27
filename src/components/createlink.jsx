@@ -23,6 +23,7 @@ const CreateLink = ({fetchurls}) => {
   const user = useSelector((state) => state.auth.userData);
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState()
+  const [isOpen, setIsOpen] = useState(!!searchParams.get("createNew"));
   const longLink = searchParams.get("createNew");
   const [formData, setFormdata] = useState({
     title: "",
@@ -44,8 +45,6 @@ const CreateLink = ({fetchurls}) => {
     customUrl: yup.string(),
   });
 
-  useEffect(() => {}, [user]);
-
   const handleCreateLink = async () => {
     setLoading(true)
     try {
@@ -55,6 +54,15 @@ const CreateLink = ({fetchurls}) => {
         user_id: user?.user?.id,
       });
       await fetchurls(user?.user?.id)
+      setFormdata({
+        title: "",
+        longUrl: "",
+        customUrl: "",
+      });
+
+      setIsOpen(false);
+      setSearchParams({});
+      
       console.log(data);
     } catch (error) {
       console.log(error);
@@ -67,13 +75,18 @@ const CreateLink = ({fetchurls}) => {
       setLoading(false)
     }
   };
-  useEffect(() => {}, []);
   return (
     <div>
       <AlertDialog
-        defaultOpen={longLink}
-        onOpenChange={(res) => {
-          if (!res) setSearchParams({});
+        // defaultOpen={longLink}
+        // onOpenChange={(res) => {
+        //   if (!res) setSearchParams({});
+        // }}
+
+        open={isOpen}
+        onOpenChange={(res)=>{
+          setIsOpen(res);
+          if(!res) setSearchParams({})
         }}
       >
         <AlertDialogTrigger>Open</AlertDialogTrigger>
