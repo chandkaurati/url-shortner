@@ -30,6 +30,7 @@ import shortString from "@/utils/shortstring";
 import { useSelector } from "react-redux";
 import databaseService from "@/db/database-service";
 import { BeatLoader, ClipLoader } from "react-spinners";
+import { Link } from "react-router-dom";
 
 const MyLinksTable = ({ urls, fetchurls }) => {
   const [loadingMap, setLoadingMap] = useState({});
@@ -72,7 +73,7 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                   <TableCell className="font-medium">{url.title}</TableCell>
                   <TableCell>
                     <span className="flex gap-2 items-center">
-                      {url.short_url}{" "}
+                    <Link to={`/link/${url.id}`}>{`https://BiteUrl.in/${url.custom_url ? url.custom_url : url.short_url}`}</Link>
                       <p>
                         <CopyIcon size={14} color="gray" />
                       </p>
@@ -107,20 +108,20 @@ const MyLinksTable = ({ urls, fetchurls }) => {
       <div className="w-full md:hidden">
         <div className="w-full">
           <Accordion type="multiple" collapsible>
-            {urls?.map((data, index) => {
+            {urls?.map((url, index) => {
               return (
-                <AccordionItem key={data.id} value={`item-${index + 1}`}>
-                  <AccordionTrigger>{data.title}</AccordionTrigger>
+                <AccordionItem key={url.id} value={`item-${index + 1}`}>
+                  <AccordionTrigger>{url.title}</AccordionTrigger>
                   <AccordionContent>
                     <div className="flex justify-between gap-4 ">
                       <div className="flex flex-col gap-2">
                         <p className="text-gray-400">Long url</p>
                         <span className="items-center">
-                          {data.original_url}
+                          {shortString(url.original_url)}
                         </span>
                         <p className="text-gray-400">short ulr</p>
                         <span className=" flex gap-8 items-center">
-                          {data.short_url}
+                        <Link to={`/link/${url.id}`}>{`https://BiteUrl.in/${url.custom_url ? url.custom_url : url.short_url}`}</Link>
                           <p className="text-white">
                             <CopyIcon size={15} />
                           </p>
@@ -129,7 +130,7 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                         <span> 23</span>
                         <p className="text-gray-400">Created at</p>
                         <span className="">
-                          {new Date(data.created_at).toLocaleDateString()}
+                          {new Date(url.created_at).toLocaleDateString()}
                         </span>
                       </div>
 
@@ -138,7 +139,7 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                           onClick={() => deleteUrl(data.id, user?.user?.id)}
                           className="bg-red-600 hover:bg-red-500"
                         >
-                          {loadingMap[data.id] ? (
+                          {loadingMap[url.id] ? (
                             <ClipLoader color="white" size={12} />
                           ) : (
                             <Trash2Icon size={16} color="white" />

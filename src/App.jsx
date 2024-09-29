@@ -6,6 +6,8 @@ import Dashboard from "./pages/dashboard";
 import { login } from "./store/authSclice";
 import { useDispatch } from "react-redux";
 import authService from "./db/auth-service";
+import Link from "./pages/link";
+import RedirectLink from "./pages/redirectlink";
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
@@ -17,6 +19,14 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "/link/:id",
+        element: <Link />,
+      },
+      {
+        path: "/:id",
+        element: <RedirectLink />,
       },
     ],
   },

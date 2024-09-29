@@ -1,13 +1,6 @@
 import LinkInput from "@/components/linkinput";
-import React, { useEffect } from "react";
-import { BarLoader } from "react-spinners";
-import { useSelector } from "react-redux";
+import React from "react";
 const Home = () => {
-  const Userdata = useSelector((state)=> state.auth.userData)
-  useEffect(() => {
-    console.log(Userdata)
-  }, [Userdata]);
-
   return (
     <div className=" h-full px-4">
       <div className="action-container h-1/2 mt-5 flex flex-col justify-center gap-7 items-center">

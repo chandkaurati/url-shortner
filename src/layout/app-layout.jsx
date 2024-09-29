@@ -10,7 +10,7 @@ const AppLayout = () => {
       <main className="flex-grow">
         <Outlet />
       </main>
-      <footer className="h-32 bg-slate-600 flex flex-col items-center justify-center">
+      <footer className="h-20 bg-slate-600 flex flex-col items-center justify-center">
          <p>Developed by Chand</p>
          <p>Design Credits <a href="https://www.figma.com/@mohijas" target="index">@mohijas</a></p>
       </footer>
