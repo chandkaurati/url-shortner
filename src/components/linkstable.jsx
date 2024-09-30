@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -34,6 +34,7 @@ import { Link } from "react-router-dom";
 
 const MyLinksTable = ({ urls, fetchurls }) => {
   const [loadingMap, setLoadingMap] = useState({});
+  const paragraphRef = useRef(null)
   const user = useSelector((state) => state.auth.userData);
 
   const setLoadingForUrl = (id, isLoading) => {
@@ -72,9 +73,12 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                 <TableRow key={url.id} className="">
                   <TableCell className="font-medium">{url.title}</TableCell>
                   <TableCell>
-                    <span className="flex gap-2 items-center">
-                    <Link to={`/link/${url.id}`}>{`https://BiteUrl.in/${url.custom_url ? url.custom_url : url.short_url}`}</Link>
-                      <p>
+                    <span  className="flex gap-2 items-center">
+                    <Link ref={paragraphRef} to={`/link/${url.id}`}>{`https://BiteUrl.in/${url.custom_url ? url.custom_url : url.short_url}`}</Link>
+                      <p onClick={()=>{
+                         navigator.clipboard.writeText(paragraphRef.current.innerText)
+                         alert(`link cpied ${paragraphRef.current.innerText}`)
+                      }}>
                         <CopyIcon size={14} color="gray" />
                       </p>
                     </span>
@@ -121,8 +125,14 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                         </span>
                         <p className="text-gray-400">short ulr</p>
                         <span className=" flex gap-8 items-center">
-                        <Link to={`/link/${url.id}`}>{`https://BiteUrl.in/${url.custom_url ? url.custom_url : url.short_url}`}</Link>
-                          <p className="text-white">
+                        <Link ref={paragraphRef} to={`/link/${url.id}`}>{`https://BiteUrl.in/${url.custom_url ? url.custom_url : url.short_url}`}</Link>
+                          <p className="text-white"
+                          onClick={()=>{
+                            navigator.clipboard.writeText(paragraphRef.current.innerText)
+                            // alert(`text copied ${paragraphRef.current.innerText}`)
+              
+                          }}
+                          >
                             <CopyIcon size={15} />
                           </p>
                         </span>
