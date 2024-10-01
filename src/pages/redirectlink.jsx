@@ -1,13 +1,15 @@
 import databaseService from "@/db/database-service";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { BarLoader } from "react-spinners";
 
 const RedirectLink = () => {
   const [loading, setLoading] = useState();
+  const [error, setError] = useState(null)
   const { id } = useParams();
+  const navigate = useNavigate()
 
-  async function recordUrlStats() {
+  const recordUrlStats = useCallback(async () => {
     setLoading(true);
     try {
       const data = await databaseService.getLongUrl(id);
@@ -17,20 +19,29 @@ const RedirectLink = () => {
       });
     } catch (error) {
       console.log(error);
+      setError(error)
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     recordUrlStats();
-    console.log(id)
   }, []);
 
-  
-
   if (loading) {
-    return <BarLoader width={"100%"} color="green" />;
+    return (
+      <>
+      <BarLoader width={"100%"} color="green" />
+      <div className="mt-6 flex justify-center items-center ">
+        Redirecting ...
+      </div>
+      </>
+    );
+  }
+
+  if(error){
+    navigate("/404")
   }
   return null;
 };

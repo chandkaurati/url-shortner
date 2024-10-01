@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-import { useSearchParams } from "react-router-dom";
 import { BarLoader } from "react-spinners";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
 import Error from "@/components/error";
@@ -13,7 +10,6 @@ import CreateLink from "@/components/createlink";
 import MyLinksTable from "@/components/linkstable";
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState();
-  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState();
   const [urlData, setUrlsData] = useState([]);
   const [clicksData, setClicksData] = useState([]);
@@ -23,12 +19,10 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const urls = await databaseService.getUrls(user_id);
-      console.log(urls);
       setUrlsData(urls || []);
       if (urls?.length) {
         const urlIds = urls?.map((url) => url?.id);
         const clicks = await databaseService.geturlClicks(urlIds);
-        console.log(clicks);
         setClicksData(clicks);
       }
     } catch (error) {
@@ -43,6 +37,7 @@ const Dashboard = () => {
       fetchurls(userdata.user.id);
     }
   }, [userdata, fetchurls]);
+
 
   return (
     <>
@@ -82,7 +77,7 @@ const Dashboard = () => {
           <Filter className="absolute top-2 right-2 p-1 " />
         </div>
         <div>
-          <MyLinksTable urls={urlData} fetchurls={fetchurls} />
+         <MyLinksTable urls={urlData} fetchurls={fetchurls} />
         </div>
         {false && <Error message="true" />}
       </div>

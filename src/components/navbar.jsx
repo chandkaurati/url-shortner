@@ -54,7 +54,6 @@ const Navbar = () => {
                 {data?.user?.user_metadata?.name}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem><Link to="/dashboard">My Links</Link></DropdownMenuItem>
               <DropdownMenuItem>
                 <Button onClick={handleLogout}>

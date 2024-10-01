@@ -62,8 +62,7 @@ const CreateLink = ({fetchurls}) => {
 
       setIsOpen(false);
       setSearchParams({});
-      
-      console.log(data);
+
     } catch (error) {
       console.log(error);
       const newErrors = [];

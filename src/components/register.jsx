@@ -28,8 +28,6 @@ const Register = () => {
     }));
   };
 
-  useEffect(() => {}, []);
-
   const handleSignupUser = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -52,7 +50,6 @@ const Register = () => {
         dispatch(login({ userData }));
         navigate("/dashboard");
       }
-      console.log(userData);
     } catch (error) {
       const newError = [];
       error?.inner?.forEach((err) => {

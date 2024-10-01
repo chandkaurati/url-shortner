@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { BeatLoader } from "react-spinners";
 import * as yup from "yup";
 import Error from "./error";
-import { useNavigate } from "react-router-dom";
 import authService from "@/db/auth-service";
 import { useDispatch } from "react-redux";
 import { login } from "@/store/authSclice";

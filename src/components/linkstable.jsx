@@ -14,31 +14,29 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Copy,
-  CopyIcon,
-  Delete,
-  DeleteIcon,
-  LucideDelete,
-  QrCodeIcon,
-  ShareIcon,
-  Trash,
-  Trash2Icon,
-} from "lucide-react";
+import { CopyIcon, Trash2Icon } from "lucide-react";
 import { Button } from "./ui/button";
 import shortString from "@/utils/shortstring";
 import { useSelector } from "react-redux";
 import databaseService from "@/db/database-service";
-import { BeatLoader, ClipLoader } from "react-spinners";
-import { Link } from "react-router-dom";
+import { ClipLoader } from "react-spinners";
+import { useToast } from "@/hooks/use-toast";
 
 const MyLinksTable = ({ urls, fetchurls }) => {
   const [loadingMap, setLoadingMap] = useState({});
-  const paragraphRef = useRef(null)
+  const { toast } = useToast();
   const user = useSelector((state) => state.auth.userData);
 
   const setLoadingForUrl = (id, isLoading) => {
     setLoadingMap((prevstate) => ({ ...prevstate, [id]: isLoading }));
+  };
+
+  const handleCopyLink = (link) => {
+    navigator.clipboard.writeText(link);
+    toast({
+      title: "shor link copied ",
+      description: `${link}`,
+    });
   };
 
   const deleteUrl = async (id, user_id) => {
@@ -57,14 +55,13 @@ const MyLinksTable = ({ urls, fetchurls }) => {
     <>
       <div className="hidden md:flex">
         <Table>
-          <TableCaption>A list of your recent invoices.</TableCaption>
+          <TableCaption>A list of your links created.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="">short Link</TableHead>
               <TableHead>short link</TableHead>
               <TableHead>originalLInk</TableHead>
-              <TableHead>clicks </TableHead>
-              <TableHead className="">Date</TableHead>
+              <TableHead className="">created</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -73,20 +70,22 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                 <TableRow key={url.id} className="">
                   <TableCell className="font-medium">{url.title}</TableCell>
                   <TableCell>
-                    <span  className="flex gap-2 items-center">
-                    <Link ref={paragraphRef} to={`/link/${url.id}`}>{`https://BiteUrl.in/${url.custom_url ? url.custom_url : url.short_url}`}</Link>
-                      <p onClick={()=>{
-                         navigator.clipboard.writeText(paragraphRef.current.innerText)
-                         alert(`link cpied ${paragraphRef.current.innerText}`)
-                      }}>
+                    <span className="flex gap-2 items-center">
+                      <p>{`https://BiteUrl.in/${
+                        url.custom_url ? url.custom_url : url.short_url
+                      }`}</p>
+                      <p
+                        onClick={() => {
+                          handleCopyLink(`${url.custom_url ? url.custom_url : url.short_url}`)
+                        }}
+                      >
                         <CopyIcon size={14} color="gray" />
                       </p>
                     </span>
                   </TableCell>
                   <TableCell>{shortString(url.original_url)}</TableCell>
-                  <TableCell className="">3</TableCell>
                   <TableCell className="">
-                    {new Date().toLocaleDateString()}
+                    {new Date(url.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="">
                     <Button
@@ -125,13 +124,14 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                         </span>
                         <p className="text-gray-400">short ulr</p>
                         <span className=" flex gap-8 items-center">
-                        <Link ref={paragraphRef} to={`/link/${url.id}`}>{`https://BiteUrl.in/${url.custom_url ? url.custom_url : url.short_url}`}</Link>
-                          <p className="text-white"
-                          onClick={()=>{
-                            navigator.clipboard.writeText(paragraphRef.current.innerText)
-                            // alert(`text copied ${paragraphRef.current.innerText}`)
-              
-                          }}
+                          <p>{`https://BiteUrl.in/${
+                            url.custom_url ? url.custom_url : url.short_url
+                          }`}</p>
+                          <p
+                            className="text-white"
+                            onClick={() => {
+                              handleCopyLink(`${ url.custom_url ? url.custom_url : url.short_url}`);
+                            }}
                           >
                             <CopyIcon size={15} />
                           </p>
@@ -142,12 +142,10 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                         <span className="">
                           {new Date(url.created_at).toLocaleDateString()}
                         </span>
-                      </div>
 
-                      <div className="flex justify-between p-1">
                         <Button
-                          onClick={() => deleteUrl(data.id, user?.user?.id)}
-                          className="bg-red-600 hover:bg-red-500"
+                          onClick={() => deleteUrl(url.id, user?.user?.id)}
+                          className="bg-red-600 w-40 hover:bg-red-500"
                         >
                           {loadingMap[url.id] ? (
                             <ClipLoader color="white" size={12} />

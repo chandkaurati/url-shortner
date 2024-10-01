@@ -15,11 +15,9 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
   } from "@/components/ui/card";
-  import { Input } from "./ui/input";
 import { Button } from './ui/button';
 import { ArrowRight, LogIn } from 'lucide-react';
 import Login from './login';
