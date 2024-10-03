@@ -12,7 +12,7 @@ const Home = () => {
         </h1>
         <LinkInput />
         <p className="text-center break-words font-extralight text-gray-400">
-          LinkLy is an efficient and easy-to use shortneing service that
+          Bite url is an efficient and easy-to use shortneing service that
           setreamlienes your online experience
         </p>
       </div>

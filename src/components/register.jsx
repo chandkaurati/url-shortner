@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import authService from "@/db/auth-service";
 import { login } from "@/store/authSclice";
+import { useToast } from "@/hooks/use-toast";
 const Register = () => {
   const [formdata, setFormdata] = useState({
     name: "",
@@ -16,7 +17,8 @@ const Register = () => {
     profile_pic: null,
   });
   const [loading, setLoading] = useState();
-  const [errors, setErrors] = useState([]);
+  const [apiErorr, setApiError] = useState(false)
+  const [Validationerrors, setValidationErrors] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleInputChange = (e) => {
@@ -27,7 +29,7 @@ const Register = () => {
       [name]: type === "file" ? files[0] : value,
     }));
   };
-
+  const {toast} = useToast()
   const handleSignupUser = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,22 +42,28 @@ const Register = () => {
           .required("email is required"),
         password: yup
           .string()
-          .min(6, "password mustlonger than 6 chagerater")
+          .min(6, "password must longer than 6 chagerater")
           .required("password is requred"),
       });
 
       await schema.validate(formdata, { abortEarly: false });
-      const userData = await authService.createAccount(formdata);
-      if (userData.access_token) {
-        dispatch(login({ userData }));
+      const responce  = await authService.createAccount(formdata);
+      if (responce.access_token) {
+        dispatch(login({ responce }));
         navigate("/dashboard");
+        toast({
+          title: `welcome ${responce?.user?.user_metadata.name}`,
+          description: `Enjoy our free services`,
+        });
+      }else{
+        setApiError(responce.message)
       }
     } catch (error) {
       const newError = [];
       error?.inner?.forEach((err) => {
         newError[err.path] = err.message;
       });
-      setErrors(newError);
+      setValidationErrors(newError);
     } finally {
       setLoading(false);
     }
@@ -63,7 +71,7 @@ const Register = () => {
 
   return (
     <form onSubmit={handleSignupUser}>
-      {false && <Error message={"User Already exists"} />}
+      {apiErorr && <Error message={"User Already exists"} />}
       <Input
         type="text"
         name="name"
@@ -72,7 +80,7 @@ const Register = () => {
         onChange={handleInputChange}
         placeholder="Enter your name"
       />
-      {errors.name && <Error message={errors.name} />}
+      {Validationerrors.name && <Error message={Validationerrors.name} />}
       <Input
         type="email"
         name="email"
@@ -81,7 +89,7 @@ const Register = () => {
         onChange={handleInputChange}
         placeholder="Enter your email"
       />
-      {errors.email && <Error message={errors.email} />}
+      {Validationerrors.email && <Error message={Validationerrors.email} />}
       <Input
         type="Password"
         name="password"
@@ -90,7 +98,7 @@ const Register = () => {
         className="mb-3"
         placeholder="Enter your password  "
       />
-      {errors.password && <Error message={errors.password} />}
+      {Validationerrors.password && <Error message={Validationerrors.password} />}
 
       {/* <Input
         type="file"

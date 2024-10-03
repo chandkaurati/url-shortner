@@ -7,12 +7,15 @@ import Error from "./error";
 import authService from "@/db/auth-service";
 import { useDispatch } from "react-redux";
 import { login } from "@/store/authSclice";
+import { useToast } from "@/hooks/use-toast";
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [erorrs, setErrors] = useState([]);
+  const {toast} = useToast()
+  const [apiError, setApiError] = useState(false)
+  const [validationErorrs, setValidationErrors] = useState([]);
   const [loading, setLoading] = useState();
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +29,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      setErrors([]);
+      setValidationErrors([]);
       const validateSchema = yup.object().shape({
         email: yup
           .string()
@@ -39,17 +42,22 @@ const Login = () => {
       });
 
       await validateSchema.validate(formData, { abortEarly: false });
-      const userData = await authService.setSession(formData);
-      if (userData.access_token) {
-        dispatch(login({ userData }));
-        alert("login SuccesFull, new you can user our free services")
+      const responce = await authService.setSession(formData);
+      if (responce.access_token) {
+        dispatch(login({ responce }));
+        toast({
+          title: "login success",
+          description: `Hello ${responce?.user?.user_metadata?.name}`,
+        });
+      }else{
+        setApiError(responce.message)
       }
     } catch (error) {
       const newErrors = [];
         error?.inner?.forEach((err) => {
-          newErrors[err.path] = err.message;
+        newErrors[err.path] = err.message;
         });
-        setErrors(newErrors);
+        setValidationErrors(newErrors);
     } finally {
       setLoading(false);
     }
@@ -57,7 +65,7 @@ const Login = () => {
 
   return (
     <form onSubmit={handleLogin}>
-      {false && <Error message={"wrong credentials"} />}
+      {apiError && <Error message={"wrong credentials"} />}
       <Input
         type="email"
         name="email"
@@ -66,7 +74,7 @@ const Login = () => {
         className="mb-3"
         placeholder="Enter your email"
       />
-      {erorrs.email && <Error message={erorrs.email} />}
+      {validationErorrs.email && <Error message={validationErorrs.email} />}
       <Input
         type="Password"
         name="password"
@@ -75,7 +83,7 @@ const Login = () => {
         className="mb-3"
         placeholder="Enter your password  "
       />
-      {erorrs.password && <Error message={erorrs.password} />}
+      {validationErorrs.password && <Error message={validationErorrs.password} />}
       <Button type="submit" className="mt-3">
         {loading ? <BeatLoader size={10} color="black" /> : "login"}
       </Button>
