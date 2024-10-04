@@ -2,8 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import { UAParser } from "ua-parser-js";
 class DatabaseService {
   constructor() {
+    this.supabaseUrl = import.meta.env.VITE_SUPABASE_URI;
     this.supabase = createClient(
-      import.meta.env.VITE_SUPABASE_URI,
+      this.supabaseUrl,
       import.meta.env.VITE_SUPABASE_API_KEY
     );
 
@@ -45,10 +46,17 @@ class DatabaseService {
     }
   }
 
-  async createShortUrl({ title, longUrl, customUrl, user_id }) {
+  async createShortUrl({ title, longUrl, customUrl, user_id, qr_code }) {
     const short_url = Math.random().toString(36).substring(2, 6);
+    const fileName = `qr-${short_url}`;
 
-    console.log(title, longUrl, customUrl, user_id);
+    const { error: storageErrorr } = await this.supabase.storage.from("Qrs")
+      .upload(fileName, qr_code);
+
+    if (storageErrorr) throw new Error(storageErrorr.message);
+
+    const qr = `${this.supabaseUrl}/storage/v1/object/public/Qrs/${fileName}`;
+
     const { data, error } = await this.supabase
       .from("urls")
       .insert([
@@ -58,13 +66,14 @@ class DatabaseService {
           short_url,
           original_url: longUrl,
           custom_url: customUrl || null,
+          qr,
         },
       ])
       .select();
 
     if (error) {
       console.error(error.message);
-      throw new Error("Error fetching creating url");
+      throw new Error("Error creating url");
     }
     return data;
   }
@@ -113,14 +122,14 @@ class DatabaseService {
       .from("urls")
       .select("*")
       .eq("id", id)
-      .eq("user_id", user_id) 
-      .single()
+      .eq("user_id", user_id)
+      .single();
 
     if (error) {
       console.error(error.message);
       throw new Error("Short url not found");
     }
-    return data
+    return data;
   }
 
   async getClicksForUrl(url_id) {
@@ -130,8 +139,8 @@ class DatabaseService {
       .eq("id", url_id);
 
     if (error) {
-       console.error(error)
-       throw new Error("ubable to get clicks")
+      console.error(error);
+      throw new Error("ubable to get clicks");
     }
 
     return data;

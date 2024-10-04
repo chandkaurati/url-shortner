@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
+import { QRCode } from "react-qrcode-logo";
 import * as yup from "yup";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -18,13 +18,15 @@ import { Button } from "./ui/button";
 import Error from "./error";
 import { BeatLoader } from "react-spinners";
 import databaseService from "@/db/database-service";
+import { QrCode } from "lucide-react";
 
-const CreateLink = ({fetchurls}) => {
+const CreateLink = ({ fetchurls }) => {
   const user = useSelector((state) => state.auth.userData);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [loading, setLoading] = useState()
+  const [loading, setLoading] = useState();
   const [isOpen, setIsOpen] = useState(!!searchParams.get("createNew"));
   const longLink = searchParams.get("createNew");
+  const ref = useRef(null)
   const [formData, setFormdata] = useState({
     title: "",
     longUrl: longLink ? longLink : "",
@@ -46,14 +48,17 @@ const CreateLink = ({fetchurls}) => {
   });
 
   const handleCreateLink = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       await validateSchema.validate(formData, { abortEarly: false });
-      const data = await databaseService.createShortUrl({
+      const canvas = ref.current.canvasRef.current
+      const  blob = await new Promise((resolve)=> canvas.toBlob(resolve))
+      await databaseService.createShortUrl({
         ...formData,
+        qr_code : blob,
         user_id: user?.user?.id,
       });
-      await fetchurls(user?.user?.id)
+      await fetchurls(user?.user?.id);
       setFormdata({
         title: "",
         longUrl: "",
@@ -62,7 +67,6 @@ const CreateLink = ({fetchurls}) => {
 
       setIsOpen(false);
       setSearchParams({});
-
     } catch (error) {
       console.log(error);
       const newErrors = [];
@@ -70,8 +74,8 @@ const CreateLink = ({fetchurls}) => {
         newErrors[err.path] = err.message;
       });
       setErrors(newErrors);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -83,14 +87,15 @@ const CreateLink = ({fetchurls}) => {
         // }}
 
         open={isOpen}
-        onOpenChange={(res)=>{
+        onOpenChange={(res) => {
           setIsOpen(res);
-          if(!res) setSearchParams({})
+          if (!res) setSearchParams({});
         }}
       >
         <AlertDialogTrigger>Open</AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
+            {formData?.longUrl && <QRCode value={formData?.longUrl} ref={ref} size={150} />}
             <AlertDialogTitle>Create Link</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete your

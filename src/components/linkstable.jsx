@@ -14,13 +14,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { CopyIcon, Trash2Icon } from "lucide-react";
+import { CopyIcon, QrCodeIcon, Trash2Icon } from "lucide-react";
 import { Button } from "./ui/button";
 import shortString from "@/utils/shortstring";
 import { useSelector } from "react-redux";
 import databaseService from "@/db/database-service";
 import { ClipLoader } from "react-spinners";
 import { useToast } from "@/hooks/use-toast";
+import ShareQrcode from "./ShareQrcode";
 
 const MyLinksTable = ({ urls, fetchurls }) => {
   const [loadingMap, setLoadingMap] = useState({});
@@ -61,6 +62,7 @@ const MyLinksTable = ({ urls, fetchurls }) => {
               <TableHead className="">short Link</TableHead>
               <TableHead>short link</TableHead>
               <TableHead>originalLInk</TableHead>
+              <TableHead>Qrcode</TableHead>
               <TableHead className="">created</TableHead>
             </TableRow>
           </TableHeader>
@@ -84,6 +86,7 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                     </span>
                   </TableCell>
                   <TableCell>{shortString(url.original_url)}</TableCell>
+                  <TableCell ><ShareQrcode/></TableCell>
                   <TableCell className="">
                     {new Date(url.created_at).toLocaleDateString()}
                   </TableCell>
@@ -138,6 +141,8 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                         </span>
                         <p className="text-gray-400">clicks </p>
                         <span> 23</span>
+                        <p>Qrcode</p>
+                        <span><ShareQrcode Qr={url.qr}/></span>
                         <p className="text-gray-400">Created at</p>
                         <span className="">
                           {new Date(url.created_at).toLocaleDateString()}

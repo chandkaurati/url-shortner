@@ -19,6 +19,7 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const urls = await databaseService.getUrls(user_id);
+      console.log(urls)
       setUrlsData(urls || []);
       if (urls?.length) {
         const urlIds = urls?.map((url) => url?.id);
@@ -67,15 +68,6 @@ const Dashboard = () => {
           <CreateLink fetchurls={fetchurls} />
         </div>
 
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="filter links"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Filter className="absolute top-2 right-2 p-1 " />
-        </div>
         <div>
          <MyLinksTable urls={urlData} fetchurls={fetchurls} />
         </div>
