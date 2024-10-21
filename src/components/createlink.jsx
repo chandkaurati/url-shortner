@@ -26,7 +26,7 @@ const CreateLink = ({ fetchurls }) => {
   const [loading, setLoading] = useState();
   const [isOpen, setIsOpen] = useState(!!searchParams.get("createNew"));
   const longLink = searchParams.get("createNew");
-  const ref = useRef(null)
+  const ref = useRef(null);
   const [formData, setFormdata] = useState({
     title: "",
     longUrl: longLink ? longLink : "",
@@ -49,13 +49,14 @@ const CreateLink = ({ fetchurls }) => {
 
   const handleCreateLink = async () => {
     setLoading(true);
+    setErrors({})
     try {
       await validateSchema.validate(formData, { abortEarly: false });
-      const canvas = ref.current.canvasRef.current
-      const  blob = await new Promise((resolve)=> canvas.toBlob(resolve))
+      const canvas = ref.current.canvasRef.current;
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve));
       await databaseService.createShortUrl({
         ...formData,
-        qr_code : blob,
+        qr_code: blob,
         user_id: user?.user?.id,
       });
       await fetchurls(user?.user?.id);
@@ -92,10 +93,14 @@ const CreateLink = ({ fetchurls }) => {
           if (!res) setSearchParams({});
         }}
       >
-        <AlertDialogTrigger>Open</AlertDialogTrigger>
+        <AlertDialogTrigger className="bg-white text-black font-semibold px-4 py-1 rounded-md">
+          CreateLink
+        </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            {formData?.longUrl && <QRCode value={formData?.longUrl} ref={ref} size={150} />}
+            {formData?.longUrl && (
+              <QRCode value={formData?.longUrl} ref={ref} size={150} />
+            )}
             <AlertDialogTitle>Create Link</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete your
@@ -103,6 +108,7 @@ const CreateLink = ({ fetchurls }) => {
             </AlertDialogDescription>
 
             <div className="text-left flex flex-col gap-3">
+              {errors?.title && <Error message={errors.title} />}
               <Input
                 type="text"
                 name="title"
@@ -110,7 +116,7 @@ const CreateLink = ({ fetchurls }) => {
                 onChange={handleInputChange}
                 placeholder="enter a title"
               />
-              {errors?.title && <Error message={errors.title} />}
+              {errors?.longUrl && <Error message={errors.longUrl} />}
               <Input
                 type="text"
                 name="longUrl"
@@ -118,7 +124,6 @@ const CreateLink = ({ fetchurls }) => {
                 onChange={handleInputChange}
                 placeholder="enter a your long Link"
               />
-              {errors?.longUrl && <Error message={errors.longUrl} />}
 
               <Input
                 type="text"
@@ -131,7 +136,7 @@ const CreateLink = ({ fetchurls }) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <Button onClick={handleCreateLink}>
+            <Button disabled={loading} onClick={handleCreateLink}>
               {loading ? <BeatLoader size={10} /> : "create url"}
             </Button>
           </AlertDialogFooter>

@@ -8,23 +8,23 @@ class AuthService {
     );
   }
 
-  async createAccount({ name, email, password}) {
-      const { data, error } = await this.supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-          },
+  async createAccount({ name, email, password }) {
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
         },
-      });
-
-      if(error){
-        return error
-      }
-      if (data?.session) {
-        return data?.session;
-      }
+      },
+    });
+    
+    if (error) {
+      return error;
+    }
+    if (data?.session) {
+      return data?.session;
+    }
   }
 
   async setSession({ email, password }) {
@@ -33,12 +33,12 @@ class AuthService {
       password,
     });
 
-    if(error){
-      return error
+    if (error) {
+      return error;
     }
 
     if (data?.session) {
-      return data?.session
+      return data?.session;
     }
   }
 

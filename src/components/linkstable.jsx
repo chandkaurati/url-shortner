@@ -31,14 +31,18 @@ const MyLinksTable = ({ urls, fetchurls }) => {
   const setLoadingForUrl = (id, isLoading) => {
     setLoadingMap((prevstate) => ({ ...prevstate, [id]: isLoading }));
   };
-
+ 
+  //copy short link function
   const handleCopyLink = (link) => {
     navigator.clipboard.writeText(link);
     toast({
-      title: "shor link copied ",
-      description: `${link}`,
+      title: "service Down",
+      description: `Temporarly url service is down But you can still create Qr codes of long urls and share It
+    `,
     });
   };
+
+  //delete url function
 
   const deleteUrl = async (id, user_id) => {
     setLoadingForUrl(id, true);
@@ -73,12 +77,14 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                   <TableCell className="font-medium">{url.title}</TableCell>
                   <TableCell>
                     <span className="flex gap-2 items-center">
-                      <p>{`https://BiteUrl.in/${
+                      <p>{`https://biteurl.netlify.app/${
                         url.custom_url ? url.custom_url : url.short_url
                       }`}</p>
                       <p
                         onClick={() => {
-                          handleCopyLink(`${url.custom_url ? url.custom_url : url.short_url}`)
+                          handleCopyLink(
+                            `https://biteurl.netlify.app/${url.custom_url ? url.custom_url : url.short_url}`
+                          );
                         }}
                       >
                         <CopyIcon size={14} color="gray" />
@@ -86,7 +92,10 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                     </span>
                   </TableCell>
                   <TableCell>{shortString(url.original_url)}</TableCell>
-                  <TableCell ><ShareQrcode/></TableCell>
+                  <TableCell>
+                    {/* share qr code popup */}
+                    <ShareQrcode Qr={url.qr} title={url.title} />
+                  </TableCell>
                   <TableCell className="">
                     {new Date(url.created_at).toLocaleDateString()}
                   </TableCell>
@@ -127,13 +136,19 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                         </span>
                         <p className="text-gray-400">short ulr</p>
                         <span className=" flex gap-8 items-center">
-                          <p>{`https://BiteUrl.in/${
+                          <p>{`https://biteurl.netlify.app/${
                             url.custom_url ? url.custom_url : url.short_url
                           }`}</p>
                           <p
                             className="text-white"
                             onClick={() => {
-                              handleCopyLink(`${ url.custom_url ? url.custom_url : url.short_url}`);
+                              handleCopyLink(
+                                `https://biteurl.netlify.app${
+                                  url.custom_url
+                                    ? url.custom_url
+                                    : url.short_url
+                                }`
+                              );
                             }}
                           >
                             <CopyIcon size={15} />
@@ -142,7 +157,10 @@ const MyLinksTable = ({ urls, fetchurls }) => {
                         <p className="text-gray-400">clicks </p>
                         <span> 23</span>
                         <p>Qrcode</p>
-                        <span><ShareQrcode Qr={url.qr}/></span>
+                        <span>
+                          {/* share Qr code popup */}
+                          <ShareQrcode Qr={url.qr} />
+                        </span>
                         <p className="text-gray-400">Created at</p>
                         <span className="">
                           {new Date(url.created_at).toLocaleDateString()}

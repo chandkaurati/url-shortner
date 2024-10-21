@@ -17,7 +17,7 @@ const Register = () => {
     profile_pic: null,
   });
   const [loading, setLoading] = useState();
-  const [apiErorr, setApiError] = useState(false)
+  const [apiErorr, setApiError] = useState(false);
   const [Validationerrors, setValidationErrors] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -29,7 +29,10 @@ const Register = () => {
       [name]: type === "file" ? files[0] : value,
     }));
   };
-  const {toast} = useToast()
+  //hook to show toast message after user registered succssfully
+  const { toast } = useToast();
+
+  // handle register user function
   const handleSignupUser = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -47,16 +50,16 @@ const Register = () => {
       });
 
       await schema.validate(formdata, { abortEarly: false });
-      const responce  = await authService.createAccount(formdata);
-      if (responce.access_token) {
-        dispatch(login({ responce }));
+      const userData = await authService.createAccount(formdata);
+      if (userData.access_token) {
+        dispatch(login({ userData }));
         navigate("/dashboard");
         toast({
-          title: `welcome ${responce?.user?.user_metadata.name}`,
+          title: `welcome ${userData?.user?.user_metadata.name}`,
           description: `Enjoy our free services`,
         });
-      }else{
-        setApiError(responce.message)
+      } else {
+        setApiError(userData.message);
       }
     } catch (error) {
       const newError = [];
@@ -72,6 +75,7 @@ const Register = () => {
   return (
     <form onSubmit={handleSignupUser}>
       {apiErorr && <Error message={"User Already exists"} />}
+      {Validationerrors.name && <Error message={Validationerrors.name} />}
       <Input
         type="text"
         name="name"
@@ -80,7 +84,7 @@ const Register = () => {
         onChange={handleInputChange}
         placeholder="Enter your name"
       />
-      {Validationerrors.name && <Error message={Validationerrors.name} />}
+      {Validationerrors.email && <Error message={Validationerrors.email} />}
       <Input
         type="email"
         name="email"
@@ -89,7 +93,9 @@ const Register = () => {
         onChange={handleInputChange}
         placeholder="Enter your email"
       />
-      {Validationerrors.email && <Error message={Validationerrors.email} />}
+        {Validationerrors.password && (
+          <Error message={Validationerrors.password} />
+        )}
       <Input
         type="Password"
         name="password"
@@ -98,16 +104,8 @@ const Register = () => {
         className="mb-3"
         placeholder="Enter your password  "
       />
-      {Validationerrors.password && <Error message={Validationerrors.password} />}
 
-      {/* <Input
-        type="file"
-        onChange={handleInputChange}
-        className="text-white  mb-3"
-        placeholder="Enter your password  "
-      /> */}
-
-      <Button type="submit">{loading ? <BeatLoader /> : "Register"}</Button>
+      <Button type="submit" disabled={loading}>{loading ? <BeatLoader size={10} /> : "Register"}</Button>
     </form>
   );
 };

@@ -8,7 +8,8 @@ const RedirectLink = () => {
   const [error, setError] = useState(null)
   const { id } = useParams();
   const navigate = useNavigate()
-
+    
+  //store  url clicks function
   const recordUrlStats = useCallback(async () => {
     setLoading(true);
     try {

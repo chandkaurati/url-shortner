@@ -50,7 +50,8 @@ class DatabaseService {
     const short_url = Math.random().toString(36).substring(2, 6);
     const fileName = `qr-${short_url}`;
 
-    const { error: storageErrorr } = await this.supabase.storage.from("Qrs")
+    const { error: storageErrorr } = await this.supabase.storage
+      .from("Qrs")
       .upload(fileName, qr_code);
 
     if (storageErrorr) throw new Error(storageErrorr.message);
@@ -113,7 +114,7 @@ class DatabaseService {
       window.location.href = originalUrl;
     } catch (error) {
       console.error(error.message);
-      throw new Error("Error storing link");
+      throw new Error("Error storing link");   
     }
   }
 

@@ -17,6 +17,8 @@ const Login = () => {
   const [apiError, setApiError] = useState(false)
   const [validationErorrs, setValidationErrors] = useState([]);
   const [loading, setLoading] = useState();
+  
+  //set form values 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -24,7 +26,10 @@ const Login = () => {
       [name]: value,
     }));
   };
+  
   const dispatch = useDispatch();
+
+  // handle user login function 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -42,16 +47,20 @@ const Login = () => {
       });
 
       await validateSchema.validate(formData, { abortEarly: false });
-      const responce = await authService.setSession(formData);
-      if (responce.access_token) {
-        dispatch(login({ responce }));
+      const userData = await authService.setSession(formData);
+      if (userData.access_token) {
+        console.log(userData)
+        dispatch(login({ userData }));
         toast({
           title: "login success",
-          description: `Hello ${responce?.user?.user_metadata?.name}`,
+          description: `Hello ${userData?.user?.user_metadata?.name} go to dashboard to see your created short links`,
         });
+       setValidationErrors(null)
+       setApiError(null) 
       }else{
-        setApiError(responce.message)
+        setApiError(userData.message)
       }
+     
     } catch (error) {
       const newErrors = [];
         error?.inner?.forEach((err) => {
@@ -66,6 +75,7 @@ const Login = () => {
   return (
     <form onSubmit={handleLogin}>
       {apiError && <Error message={"wrong credentials"} />}
+      {validationErorrs.email && <Error message={validationErorrs.email} />}
       <Input
         type="email"
         name="email"
@@ -74,7 +84,7 @@ const Login = () => {
         className="mb-3"
         placeholder="Enter your email"
       />
-      {validationErorrs.email && <Error message={validationErorrs.email} />}
+      {validationErorrs.password && <Error message={validationErorrs.password} />}
       <Input
         type="Password"
         name="password"
@@ -83,8 +93,7 @@ const Login = () => {
         className="mb-3"
         placeholder="Enter your password  "
       />
-      {validationErorrs.password && <Error message={validationErorrs.password} />}
-      <Button type="submit" className="mt-3">
+      <Button type="submit" disabled={loading} className="mt-3">
         {loading ? <BeatLoader size={10} color="black" /> : "login"}
       </Button>
     </form>

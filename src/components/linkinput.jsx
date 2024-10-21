@@ -22,6 +22,7 @@ const LinkInput = () => {
         className="bg-[#0A0A0A] text-white outline-none"
       />
       {!state ? (
+        //show authentication popup is user is not logged in 
         <AuthPopup title={"Shorten Now!"} isInputpopup={true}/>
       ) : (
         <Button onClick={(e)=> handleShorten(e)} className="bg-[#144EE3] hover:bg-[#0f4be2] text-white p-2 md:px-4 md:py-2 rounded-full">

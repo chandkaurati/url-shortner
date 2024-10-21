@@ -37,6 +37,7 @@ function App() {
     (async () => {
       const userData = await authService.getCurrentSession();
       if (userData?.access_token) {
+        console.log(userData)
         dispatch(login({ userData }));
       }
     })();

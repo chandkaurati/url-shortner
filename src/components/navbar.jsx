@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import AuthPopup from "./authpopup";
@@ -15,13 +15,14 @@ import { BeatLoader } from "react-spinners";
 import { useDispatch, useSelector } from "react-redux";
 import authService from "@/db/auth-service";
 import { logout } from "@/store/authSclice";
+import { useToast } from "@/hooks/use-toast";
 const Navbar = () => {
   const [loading, setLoading] = useState();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const status = useSelector((state) => state.auth.status);
   const data = useSelector((state) => state.auth.userData);
-
+  const {toast} = useToast()
   const handleLogout = async () => {
     setLoading(true);
     try {
@@ -29,6 +30,9 @@ const Navbar = () => {
       if (!responce) {
         dispatch(logout());
         navigate("/");
+        toast({
+          title: "Logged out successFully",
+        });
       }
     } catch (error) {
       console.log(error);
@@ -45,6 +49,7 @@ const Navbar = () => {
       </Link>
       <div className="flex gap-7">
         {!status ? (
+          //show the authentication popup
           <AuthPopup title="login" />
         ) : (
           <DropdownMenu>
@@ -54,7 +59,9 @@ const Navbar = () => {
                 {data?.user?.user_metadata?.name}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem><Link to="/dashboard">My Links</Link></DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/dashboard">My Links</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem>
                 <Button onClick={handleLogout}>
                   {loading ? <BeatLoader size={10} /> : "Logout"}
